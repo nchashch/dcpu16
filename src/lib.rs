@@ -92,7 +92,7 @@ impl DCPU16 {
         self.mem = rom;
     }
 
-    pub fn step(&mut self) -> Result<u16, &str> {
+    pub fn step(&mut self) -> Result<u16, &'static str> {
         let cmd_code = self.mem[self.pc as usize];
         self.pc += 1;
         let mut cycles = 0;
