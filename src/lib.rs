@@ -47,7 +47,7 @@ impl Register {
 }
 
 pub struct DCPU16 {
-    reg: EnumMap<Register, u16>,
+    pub reg: EnumMap<Register, u16>,
     pc: u16,
     sp: u16,
     ex: u16,
@@ -86,6 +86,10 @@ impl DCPU16 {
             int_queue: VecDeque::with_capacity(MAX_INT_QUEUE_SIZE),
             mem: [0x0000; 0x10000]
         }
+    }
+
+    pub fn load(&mut self, rom: [u16; 0x10000]) {
+        self.mem = rom;
     }
 
     pub fn step(&mut self) -> Result<u16, &str> {
@@ -146,7 +150,7 @@ impl DCPU16 {
                                     *b = 0;
                                     self.ex = 0;
                                 } else {
-                                    *b /= a;
+                                    *b = b.wrapping_div(a);
                                     let b32 = *b as u32;
                                     let a32 = a as u32;
                                     self.ex = (((b32 << 16) / a32) & 0xffff) as u16;
@@ -159,7 +163,7 @@ impl DCPU16 {
                                     *b = 0;
                                     self.ex = 0;
                                 } else {
-                                    let result = *b as i16 / a as i16;
+                                    let result = (*b as i16).wrapping_div(a as i16);
                                     *b = result as u16;
                                     let b32 = *b as i32;
                                     let a32 = a as i32;
@@ -479,7 +483,7 @@ impl DCPU16 {
                 self.mem[self.next_word() as usize]
             },
             Value::NextWord => {
-                self.mem[self.pc as usize]
+                self.next_word()
             },
             Value::Literal(literal) => {
                 literal
@@ -520,10 +524,13 @@ impl DCPU16 {
                 Either::Right(&mut self.ex)
             },
             Value::DerefNextWord => {
+                // self.pc increment is handled in self.next_word()
                 Either::Right(&mut self.mem[self.next_word() as usize])
             },
             Value::NextWord => {
-                Either::Right(&mut self.mem[self.pc as usize])
+                let result = &mut self.mem[self.pc as usize];
+                self.pc += 1;
+                Either::Right(result)
             },
             Value::Literal(literal) => {
                 Either::Left(*literal)
@@ -563,7 +570,9 @@ impl Value {
                 return Some(Value::IndexReg(reg));
             }
         } else if 0x20 <= val && val <= 0x3f {
-            let literal = 0xffff + val - 0x20;
+            let literal = val
+                .wrapping_add(0xffff)
+                .wrapping_sub(0x20);
             return Some(Value::Literal(literal));
         }
         match val {
@@ -592,7 +601,11 @@ impl Value {
             Value::EX => 0x1d,
             Value::DerefNextWord => 0x1e,
             Value::NextWord => 0x1f,
-            Value::Literal(literal) => *literal + 0x20 - 0xffff
+            Value::Literal(literal) => {
+                literal
+                    .wrapping_add(0x20 )
+                    .wrapping_sub(0xffff)
+            }
         }
     }
 
