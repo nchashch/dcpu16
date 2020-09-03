@@ -1,10 +1,6 @@
 mod lib;
 
 fn main() {
-    println!("Hello, world!");
-    let val = 0x01 | (0x11 << 5) | (0x07 << 10);
-    let cmd = lib::Command::new(val).unwrap();
-    dbg!(&cmd, cmd.code());
     let mut dcpu16 = lib::DCPU16::new();
     let mut rom: [u16; 0x10000] = [0x0000; 0x10000];
     rom[0] = (0x3f << 10) | (0x01 << 5) | 0x01;
