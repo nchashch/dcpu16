@@ -1,7 +1,7 @@
-mod lib;
+mod dcpu;
 
 fn main() {
-    let mut dcpu16 = lib::DCPU16::new();
+    let mut dcpu16 = dcpu::DCPU16::new();
     let mut rom: [u16; 0x10000] = [0x0000; 0x10000];
     rom[0] = (0x3f << 10) | (0x01 << 5) | 0x01;
     rom[1] = (0x22 << 10) | (0x01 << 5) | 0x02;
@@ -11,16 +11,15 @@ fn main() {
     rom[5] = 12345;
     rom[6] = (0x02 << 10) | (0x03 << 5) | 0x01;
     dcpu16.load(rom);
-    dcpu16.step();
-    dbg!(dcpu16.reg);
-    dcpu16.step();
-    dbg!(dcpu16.reg);
-    dcpu16.step();
-    dbg!(dcpu16.reg);
-    dcpu16.step();
-    dbg!(dcpu16.reg);
-    dcpu16.step();
-    dbg!(dcpu16.reg);
-    dcpu16.step();
-    dbg!(dcpu16.reg);
+    loop {
+        let report = dcpu16.step();
+        match report {
+            Ok(pc) => {
+                dbg!(pc, dcpu16.reg);
+            },
+            Err(err) => {
+                panic!(err);
+            }
+        }
+    }
 }
