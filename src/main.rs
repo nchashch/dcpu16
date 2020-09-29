@@ -59,8 +59,7 @@ jsr 5;
             Ok(pc) => {
                 dbg!(pc, dcpu16.reg);
             },
-            Err(err) => {
-                dbg!(err);
+            Err(_) => {
                 break;
             }
         }
