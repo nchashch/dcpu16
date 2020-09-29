@@ -79,8 +79,42 @@ impl Command {
                 let op_code = 0x00;
                 let a_code = a.code();
                 let special_op_code = op.code();
-                (a_code << A_SHIFT) | (special_op_code << A_SHIFT) | op_code
+                dbg!(op_code, a_code, special_op_code);
+                (a_code << A_SHIFT) | (special_op_code << B_SHIFT) | op_code
             }
         }
+    }
+
+    pub fn get_size(&self) -> u16 {
+        let command_size = 1;
+        let next_words_size = match self {
+            Command::Special { op: _, a } => {
+                match get_next_word(a) {
+                    Some(_) => 1,
+                    None => 0
+                }
+            },
+            Command::Basic { op: _, b, a } => {
+                let b_size = match get_next_word(b) {
+                    Some(_) => 1,
+                    None => 0
+                };
+                let a_size = match get_next_word(a) {
+                    Some(_) => 1,
+                    None => 0
+                };
+                b_size + a_size
+            }
+        };
+        command_size + next_words_size
+    }
+}
+
+pub fn get_next_word(value: &Value) -> Option<u16> {
+    match value {
+        Value::IndexReg(_, word) => Some(*word),
+        Value::DerefNextWord(word) => Some(*word),
+        Value::NextWord(word) => Some(*word),
+        _ => None
     }
 }

@@ -50,7 +50,7 @@ impl DCPU16 {
                 Register::J => 0x0000,
             },
             pc: 0x0000,
-            sp: 0x0000,
+            sp: 0xFFFF,
             ex: 0x0000,
             ia: 0x0000,
             interrupt_queueing: false,
@@ -210,7 +210,9 @@ impl DCPU16 {
                                 // Do nothing
                             } else {
                                 // Skip next instruction
-                                self.pc += 1;
+                                let cmd = Command::new(self.mem[(self.pc + 1) as usize]).unwrap();
+                                let steps = cmd.get_size();
+                                self.pc += steps;
                             }
                         },
                         BasicOp::IFC => {
@@ -222,7 +224,9 @@ impl DCPU16 {
                                 // Do nothing
                             } else {
                                 // Skip next instruction
-                                self.pc += 1;
+                                let cmd = Command::new(self.mem[(self.pc + 1) as usize]).unwrap();
+                                let steps = cmd.get_size();
+                                self.pc += steps;
                             }
                         },
                         BasicOp::IFE => {
@@ -234,7 +238,9 @@ impl DCPU16 {
                                 // Do nothing
                             } else {
                                 // Skip next instruction
-                                self.pc += 1;
+                                let cmd = Command::new(self.mem[(self.pc + 1) as usize]).unwrap();
+                                let steps = cmd.get_size();
+                                self.pc += steps;
                             }
                         },
                         BasicOp::IFN => {
@@ -246,7 +252,9 @@ impl DCPU16 {
                                 // Do nothing
                             } else {
                                 // Skip next instruction
-                                self.pc += 1;
+                                let cmd = Command::new(self.mem[(self.pc + 1) as usize]).unwrap();
+                                let steps = cmd.get_size();
+                                self.pc += steps;
                             }
                         },
                         BasicOp::IFG => {
@@ -258,7 +266,9 @@ impl DCPU16 {
                                 // Do nothing
                             } else {
                                 // Skip next instruction
-                                self.pc += 1;
+                                let cmd = Command::new(self.mem[(self.pc + 1) as usize]).unwrap();
+                                let steps = cmd.get_size();
+                                self.pc += steps;
                             }
                         },
                         BasicOp::IFA => {
@@ -270,7 +280,9 @@ impl DCPU16 {
                                 // Do nothing
                             } else {
                                 // Skip next instruction
-                                self.pc += 1;
+                                let cmd = Command::new(self.mem[(self.pc + 1) as usize]).unwrap();
+                                let steps = cmd.get_size();
+                                self.pc += steps;
                             }
                         },
                         BasicOp::IFL => {
@@ -282,7 +294,9 @@ impl DCPU16 {
                                 // Do nothing
                             } else {
                                 // Skip next instruction
-                                self.pc += 1;
+                                let cmd = Command::new(self.mem[self.pc as usize]).unwrap();
+                                let steps = cmd.get_size();
+                                self.pc += steps;
                             }
                         },
                         BasicOp::IFU => {
@@ -294,7 +308,9 @@ impl DCPU16 {
                                 // Do nothing
                             } else {
                                 // Skip next instruction
-                                self.pc += 1;
+                                let cmd = Command::new(self.mem[(self.pc + 1) as usize]).unwrap();
+                                let steps = cmd.get_size();
+                                self.pc += steps;
                             }
                         },
 
@@ -342,8 +358,8 @@ impl DCPU16 {
                                 Either::Right(a) => *a,
                                 Either::Left(a) => a
                             };
-                            self.sp += 1;
                             self.mem[self.sp as usize] = self.pc;
+                            self.sp -= 1;
                             self.pc = a;
                         },
                         SpecialOp::INT => {
@@ -424,7 +440,7 @@ impl DCPU16 {
             Value::DerefReg(reg) => {
                 self.mem[self.reg[reg] as usize]
             },
-            Value::IndexReg(reg) => {
+            Value::IndexReg(reg, _) => {
                 let address = self.reg[reg] + self.next_word();
                 self.mem[address as usize]
             },
@@ -449,10 +465,10 @@ impl DCPU16 {
             Value::EX => {
                 self.ex
             },
-            Value::DerefNextWord => {
+            Value::DerefNextWord(_) => {
                 self.mem[self.next_word() as usize]
             },
-            Value::NextWord => {
+            Value::NextWord(_) => {
                 self.next_word()
             },
             Value::Literal(literal) => {
@@ -469,7 +485,7 @@ impl DCPU16 {
             Value::DerefReg(reg) => {
                 Either::Right(&mut self.mem[self.reg[*reg] as usize])
             },
-            Value::IndexReg(reg) => {
+            Value::IndexReg(reg, _) => {
                 let address = self.reg[*reg] + self.next_word();
                 Either::Right(&mut self.mem[address as usize])
             },
@@ -493,11 +509,11 @@ impl DCPU16 {
             Value::EX => {
                 Either::Right(&mut self.ex)
             },
-            Value::DerefNextWord => {
+            Value::DerefNextWord(_) => {
                 // self.pc increment is handled in self.next_word()
                 Either::Right(&mut self.mem[self.next_word() as usize])
             },
-            Value::NextWord => {
+            Value::NextWord(_) => {
                 let result = &mut self.mem[self.pc as usize];
                 self.pc += 1;
                 Either::Right(result)

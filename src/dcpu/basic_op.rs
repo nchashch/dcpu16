@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[derive(Debug)]
 pub enum BasicOp {
     SET,
@@ -133,6 +135,42 @@ impl BasicOp {
 
             BasicOp::STI => 2,
             BasicOp::STD => 2
+        }
+    }
+}
+
+impl FromStr for BasicOp {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "set" => Ok(BasicOp::SET),
+            "add" => Ok(BasicOp::ADD),
+            "sub" => Ok(BasicOp::SUB),
+            "mul" => Ok(BasicOp::MUL),
+            "mli" => Ok(BasicOp::MLI),
+            "div" => Ok(BasicOp::DIV),
+            "dvi" => Ok(BasicOp::DVI),
+            "mod" => Ok(BasicOp::MOD),
+            "mdi" => Ok(BasicOp::MDI),
+            "and" => Ok(BasicOp::AND),
+            "bor" => Ok(BasicOp::BOR),
+            "xor" => Ok(BasicOp::XOR),
+            "shr" => Ok(BasicOp::SHR),
+            "asr" => Ok(BasicOp::ASR),
+            "shl" => Ok(BasicOp::SHL),
+            "ifb" => Ok(BasicOp::IFB),
+            "ifc" => Ok(BasicOp::IFC),
+            "ife" => Ok(BasicOp::IFE),
+            "ifn" => Ok(BasicOp::IFN),
+            "ifg" => Ok(BasicOp::IFG),
+            "ifa" => Ok(BasicOp::IFA),
+            "ifl" => Ok(BasicOp::IFL),
+            "ifu" => Ok(BasicOp::IFU),
+            "adx" => Ok(BasicOp::ADX),
+            "sbx" => Ok(BasicOp::SBX),
+            "sti" => Ok(BasicOp::STI),
+            "std" => Ok(BasicOp::STD),
+            _ => Err(())
         }
     }
 }

@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use enum_map::{Enum};
 
 #[derive(Debug, Enum, Copy, Clone)]
@@ -37,6 +38,23 @@ impl Register {
             Register::Z => 0x05,
             Register::I => 0x06,
             Register::J => 0x07
+        }
+    }
+}
+
+impl FromStr for Register {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err>{
+        match s {
+            "a" => Ok(Register::A),
+            "b" => Ok(Register::B),
+            "c" => Ok(Register::C),
+            "x" => Ok(Register::X),
+            "y" => Ok(Register::Y),
+            "z" => Ok(Register::Z),
+            "i" => Ok(Register::I),
+            "j" => Ok(Register::J),
+            _ => Err(())
         }
     }
 }

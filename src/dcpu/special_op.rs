@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[derive(Debug)]
 pub enum SpecialOp {
     JSR,
@@ -54,6 +56,24 @@ impl SpecialOp {
             SpecialOp::HWN => 2,
             SpecialOp::HWQ => 4,
             SpecialOp::HWI => 4
+        }
+    }
+}
+
+impl FromStr for SpecialOp {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "jsr" => Ok(SpecialOp::JSR),
+            "int" => Ok(SpecialOp::INT),
+            "iag" => Ok(SpecialOp::IAG),
+            "ias" => Ok(SpecialOp::IAS),
+            "rfi" => Ok(SpecialOp::RFI),
+            "iaq" => Ok(SpecialOp::IAQ),
+            "hwn" => Ok(SpecialOp::HWN),
+            "hwq" => Ok(SpecialOp::HWQ),
+            "hwi" => Ok(SpecialOp::HWI),
+            _ => Err(())
         }
     }
 }

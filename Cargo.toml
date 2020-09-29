@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 enum-map = "0.6.2"
 either = "1.6.0"
+nalgebra = "0.22.0"
+nom = "5.1.2"
